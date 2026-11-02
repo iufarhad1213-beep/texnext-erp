@@ -1,19 +1,446 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="TexNext ERP - Textile & Garments Management" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <title>TexNext ERP</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TexNext ERP - Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#EEF4FC', 100: '#DCE8F8', 500: '#1565E0', 600: '#0B5BD3', 700: '#0A4BB0', 900: '#0B1F4B' },
+          },
+          fontFamily: { sans: ['Inter', 'Noto Sans Bengali', 'system-ui', 'sans-serif'] },
+          boxShadow: { card: '0 20px 50px -20px rgba(11,31,75,0.25)' },
+        },
+      },
+    };
+  </script>
+  <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
+  <style>
+    body { font-family: 'Inter', 'Noto Sans Bengali', system-ui, sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen bg-brand-50 text-brand-900 antialiased">
+  <div id="root"></div>
+
+  <script type="text/babel" data-presets="react">
+    const { useState, useEffect, useMemo } = React;
+
+    /* ============================================================
+       ১. CONFIGURATION
+       Supabase তথ্য এখানে বসান। খালি রাখলে ডেমো মোড চলবে।
+       ============================================================ */
+    const CONFIG = {
+      SUPABASE_URL: '',            // যেমন: https://xxxx.supabase.co
+      SUPABASE_ANON_KEY: '',       // শুধু anon (public) key, service_role নয়
+      COMPANY_NAME: 'Your Company',
+      COMPANY_TAGLINE: 'Your company tagline',
+      COMPANY_LOGO_URL: '',        // খালি থাকলে TexNext mark দেখাবে
+      LOGIN_BACKGROUND_URL: '',    // factory ছবির URL, খালি থাকলে হালকা নীল ব্যাকগ্রাউন্ড
+    };
+
+    /* ============================================================
+       ২. TRANSLATIONS (English + বাংলা)
+       ============================================================ */
+    const T = {
+      en: {
+        tagline: 'Smart Factory. Smarter Business.',
+        heading: 'Complete Textile & Garments Management Solution',
+        subtitle: 'From Order to Delivery — All in One Platform',
+        f_orders: 'Order Management',
+        f_production: 'Production Monitoring',
+        f_quality: 'Quality Control',
+        f_inventory: 'Inventory Management',
+        f_analytics: 'Business Analytics',
+        slogan: 'Drive Efficiency • Ensure Quality • Grow Together',
+        brand_sub: 'Textile | Garments | Beyond',
+        welcome: 'Welcome Back!',
+        signin: 'Sign in to continue your journey',
+        email: 'Username / Email',
+        password: 'Password',
+        show: 'Show password',
+        hide: 'Hide password',
+        remember: 'Remember Me',
+        forgot: 'Forgot Password?',
+        login: 'Login',
+        logging: 'Signing in…',
+        or: 'Or continue with',
+        google: 'Google',
+        online: 'System Online',
+        secure: 'Secure • Reliable • Scalable',
+        rights: 'All rights reserved.',
+        e_required: 'Please enter your email and password.',
+        e_email: 'Please enter a valid email address.',
+        e_invalid: 'Incorrect email or password.',
+        e_generic: 'Something went wrong. Please try again.',
+        e_config: 'Sign-in is not connected. Add Supabase settings in CONFIG.',
+        reset: 'Password reset will be available in the next step.',
+      },
+      bn: {
+        tagline: 'স্মার্ট ফ্যাক্টরি। স্মার্ট ব্যবসা।',
+        heading: 'সম্পূর্ণ টেক্সটাইল ও গার্মেন্টস ব্যবস্থাপনা সমাধান',
+        subtitle: 'অর্ডার থেকে ডেলিভারি — একটি প্ল্যাটফর্মে সবকিছু',
+        f_orders: 'অর্ডার ব্যবস্থাপনা',
+        f_production: 'উৎপাদন পর্যবেক্ষণ',
+        f_quality: 'মান নিয়ন্ত্রণ',
+        f_inventory: 'ইনভেন্টরি ব্যবস্থাপনা',
+        f_analytics: 'ব্যবসায়িক বিশ্লেষণ',
+        slogan: 'দক্ষতা বাড়ান • মান নিশ্চিত করুন • একসাথে এগিয়ে যান',
+        brand_sub: 'টেক্সটাইল | গার্মেন্টস | বিয়ন্ড',
+        welcome: 'স্বাগতম!',
+        signin: 'আপনার যাত্রা চালিয়ে যেতে সাইন ইন করুন',
+        email: 'ব্যবহারকারী নাম / ইমেইল',
+        password: 'পাসওয়ার্ড',
+        show: 'পাসওয়ার্ড দেখান',
+        hide: 'পাসওয়ার্ড লুকান',
+        remember: 'আমাকে মনে রাখুন',
+        forgot: 'পাসওয়ার্ড ভুলে গেছেন?',
+        login: 'লগ ইন',
+        logging: 'সাইন ইন হচ্ছে…',
+        or: 'অথবা এর মাধ্যমে চালিয়ে যান',
+        google: 'Google',
+        online: 'সিস্টেম অনলাইন',
+        secure: 'নিরাপদ • নির্ভরযোগ্য • স্কেলযোগ্য',
+        rights: 'সর্বস্বত্ব সংরক্ষিত।',
+        e_required: 'অনুগ্রহ করে ইমেইল ও পাসওয়ার্ড লিখুন।',
+        e_email: 'অনুগ্রহ করে একটি সঠিক ইমেইল ঠিকানা লিখুন।',
+        e_invalid: 'ইমেইল বা পাসওয়ার্ড ভুল।',
+        e_generic: 'কিছু একটা ভুল হয়েছে। আবার চেষ্টা করুন।',
+        e_config: 'সাইন-ইন সংযুক্ত নয়। CONFIG-এ Supabase তথ্য যোগ করুন।',
+        reset: 'পাসওয়ার্ড রিসেট পরবর্তী ধাপে যুক্ত হবে।',
+      },
+    };
+
+    /* ============================================================
+       ৩. ICONS (inline SVG, কোনো বাইরের লাইব্রেরি লাগে না)
+       ============================================================ */
+    const Icon = ({ d, className = 'h-5 w-5', stroke = 2 }) => (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={stroke}
+           strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+        {d}
+      </svg>
+    );
+    const I = {
+      user: <><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></>,
+      lock: <><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></>,
+      eye: <><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></>,
+      eyeOff: <><path d="M3 3l18 18" /><path d="M10.6 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6C3.6 8.6 2 12 2 12s3.5 7 10 7a9.7 9.7 0 0 0 4.4-1" /></>,
+      login: <><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><path d="M10 17l5-5-5-5" /><path d="M15 12H3" /></>,
+      globe: <><circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20" /></>,
+      shield: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />,
+      cart: <><circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" /><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6" /></>,
+      factory: <><path d="M2 20V8l6 4V8l6 4V4h8v16z" /><path d="M6 20v-2M10 20v-2M14 20v-2M18 20v-2" /></>,
+      check: <><path d="M9 12l2 2 4-4" /><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></>,
+      box: <><path d="M21 8l-9-5-9 5 9 5 9-5z" /><path d="M3 8v8l9 5 9-5V8" /><path d="M12 13v8" /></>,
+      chart: <><path d="M3 3v18h18" /><path d="M7 15l4-4 3 3 5-6" /></>,
+    };
+
+    /* ============================================================
+       ৪. SUPABASE (সরাসরি REST, কোনো SDK ছাড়া)
+       ============================================================ */
+    const isConfigured = Boolean(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY);
+
+    async function signInWithEmail(email, password) {
+      const res = await fetch(`${CONFIG.SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: {
+          apikey: CONFIG.SUPABASE_ANON_KEY,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error_description || data.msg || 'INVALID');
+      // Remember Me: session localStorage-এ থাকবে; না হলে sessionStorage
+      return data;
+    }
+
+    function signInWithGoogle() {
+      const redirect = encodeURIComponent(window.location.origin + window.location.pathname);
+      window.location.href =
+        `${CONFIG.SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to=${redirect}`;
+    }
+
+    /* ============================================================
+       ৫. LANGUAGE HOOK
+       ============================================================ */
+    function useLang() {
+      const [lang, setLang] = useState(() => localStorage.getItem('texnext.lang') || 'en');
+      useEffect(() => {
+        localStorage.setItem('texnext.lang', lang);
+        document.documentElement.lang = lang;
+      }, [lang]);
+      const t = (k) => T[lang][k] ?? k;
+      return { lang, setLang, t };
+    }
+
+    /* ============================================================
+       ৬. BRAND COMPONENTS
+       ============================================================ */
+    function TexNextMark({ className = 'h-16 w-16' }) {
+      return (
+        <svg viewBox="0 0 96 80" className={className} aria-hidden="true" fill="none">
+          <path d="M48 6c0 4-3 6-6 6 1 3 4 4 6 2" stroke="#1565E0" strokeWidth="3" strokeLinecap="round" />
+          <path d="M48 14v8M48 22L22 40c-2 1.5-1 4 1 4h50c2 0 3-2.5 1-4L48 22z"
+                stroke="#1565E0" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
+          <path d="M22 40l-6 12M74 40l6 12" stroke="#0B1F4B" strokeWidth="3" strokeLinecap="round" />
+          <path d="M14 52c12 6 56 6 68 0" stroke="#1565E0" strokeWidth="3" strokeLinecap="round" />
+        </svg>
+      );
+    }
+
+    function Wordmark({ size = 'lg' }) {
+      const cls = size === 'lg' ? 'text-5xl' : 'text-3xl';
+      return (
+        <div className={`font-extrabold tracking-tight leading-none ${cls}`}>
+          <span className="text-brand-900">TexNext </span>
+          <span className="text-brand-600">ERP</span>
+        </div>
+      );
+    }
+
+    function LangSwitch({ lang, setLang }) {
+      const btn = (code, label) => (
+        <button type="button" onClick={() => setLang(code)} aria-pressed={lang === code}
+                className={lang === code ? 'font-semibold text-brand-600' : 'text-slate-500 hover:text-brand-900'}>
+          {label}
+        </button>
+      );
+      return (
+        <div className="inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 text-sm font-medium text-brand-900 shadow-sm ring-1 ring-brand-100">
+          <Icon d={I.globe} className="h-4 w-4 text-slate-600" />
+          {btn('en', 'EN')}
+          <span className="text-slate-300">|</span>
+          {btn('bn', 'বাংলা')}
+        </div>
+      );
+    }
+
+    /* ============================================================
+       ৭. LOGIN CARD
+       ============================================================ */
+    function LoginCard({ t, lang, setLang, onSuccess }) {
+      const [email, setEmail] = useState('');
+      const [password, setPassword] = useState('');
+      const [remember, setRemember] = useState(true);
+      const [showPw, setShowPw] = useState(false);
+      const [loading, setLoading] = useState(false);
+      const [error, setError] = useState('');
+      const [notice, setNotice] = useState('');
+
+      const submit = async (e) => {
+        e.preventDefault();
+        setError(''); setNotice('');
+        if (!email.trim() || !password) return setError(t('e_required'));
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return setError(t('e_email'));
+        if (!isConfigured) return setError(t('e_config'));
+        setLoading(true);
+        try {
+          const session = await signInWithEmail(email.trim(), password);
+          const store = remember ? localStorage : sessionStorage;
+          store.setItem('texnext.session', JSON.stringify(session));
+          onSuccess && onSuccess(session);
+        } catch {
+          setError(t('e_invalid'));
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const google = () => {
+        setError('');
+        if (!isConfigured) return setError(t('e_config'));
+        signInWithGoogle();
+      };
+
+      const field = 'w-full rounded-xl border border-brand-100 bg-white py-3.5 pl-12 text-[15px] text-brand-900 placeholder:text-slate-400 shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15';
+
+      return (
+        <div className="mx-auto w-full max-w-md">
+          <div className="mb-8 flex flex-col items-center text-center">
+            <div className="mb-4 flex w-full items-center justify-between lg:hidden">
+              <span />
+              <LangSwitch lang={lang} setLang={setLang} />
+            </div>
+            <TexNextMark className="h-20 w-24" />
+            <div className="mt-3"><Wordmark size="lg" /></div>
+            <p className="mt-3 text-[15px] tracking-wide text-slate-600">{t('brand_sub')}</p>
+          </div>
+
+          <div className="mb-6 border-t border-brand-100" />
+
+          <div className="mb-7 text-center">
+            <h1 className="text-2xl font-bold text-brand-900">{t('welcome')}</h1>
+            <p className="mt-1.5 text-[15px] text-slate-600">{t('signin')}</p>
+          </div>
+
+          {notice && <p role="status" className="mb-4 rounded-lg bg-brand-50 px-4 py-3 text-sm text-brand-900">{notice}</p>}
+
+          <form onSubmit={submit} noValidate className="space-y-4">
+            {error && <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
+
+            <div className="relative">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"><Icon d={I.user} /></span>
+              <label htmlFor="email" className="sr-only">{t('email')}</label>
+              <input id="email" type="text" autoComplete="username" value={email}
+                     onChange={(e) => setEmail(e.target.value)} placeholder={t('email')} className={field} />
+            </div>
+
+            <div className="relative">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"><Icon d={I.lock} /></span>
+              <label htmlFor="password" className="sr-only">{t('password')}</label>
+              <input id="password" type={showPw ? 'text' : 'password'} autoComplete="current-password"
+                     value={password} onChange={(e) => setPassword(e.target.value)}
+                     placeholder={t('password')} className={`${field} pr-12`} />
+              <button type="button" onClick={() => setShowPw(!showPw)}
+                      aria-label={showPw ? t('hide') : t('show')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-slate-500 hover:text-brand-600">
+                <Icon d={showPw ? I.eyeOff : I.eye} />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between gap-3 pt-1">
+              <label className="flex cursor-pointer items-center gap-2.5 text-[15px] text-brand-900">
+                <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)}
+                       className="h-[18px] w-[18px] rounded border-brand-100 text-brand-600 focus:ring-brand-500" />
+                {t('remember')}
+              </label>
+              <button type="button" onClick={() => setNotice(t('reset'))}
+                      className="text-[15px] font-medium text-brand-600 hover:text-brand-700 hover:underline">
+                {t('forgot')}
+              </button>
+            </div>
+
+            <button type="submit" disabled={loading}
+                    className="flex w-full items-center justify-center gap-2.5 rounded-xl bg-brand-600 py-3.5 text-base font-semibold text-white shadow-md transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-70">
+              <Icon d={I.login} />
+              {loading ? t('logging') : t('login')}
+            </button>
+
+            <div className="flex items-center gap-4 pt-2">
+              <span className="h-px flex-1 bg-brand-100" />
+              <span className="text-sm text-slate-500">{t('or')}</span>
+              <span className="h-px flex-1 bg-brand-100" />
+            </div>
+
+            <button type="button" onClick={google}
+                    className="flex w-full items-center justify-center gap-3 rounded-xl border border-brand-100 bg-white py-3 text-[15px] font-medium text-brand-900 shadow-sm transition hover:bg-brand-50">
+              <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+                <path fill="#4285F4" d="M23.5 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47a5.54 5.54 0 0 1-2.4 3.64v3.02h3.88c2.27-2.09 3.55-5.17 3.55-8.9z" />
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.02c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.76-2.11-6.71-4.95H1.29v3.11A12 12 0 0 0 12 24z" />
+                <path fill="#FBBC05" d="M5.29 14.28A7.2 7.2 0 0 1 4.9 12c0-.79.14-1.56.39-2.28V6.61H1.29A12 12 0 0 0 0 12c0 1.94.46 3.77 1.29 5.39l4-3.11z" />
+                <path fill="#EA4335" d="M12 4.77c1.76 0 3.35.61 4.6 1.8l3.43-3.43A11.5 11.5 0 0 0 12 0 12 12 0 0 0 1.29 6.61l4 3.11C6.24 6.88 8.88 4.77 12 4.77z" />
+              </svg>
+              {t('google')}
+            </button>
+          </form>
+
+          <div className="mt-8 flex items-center justify-between gap-4 rounded-xl border border-brand-100 bg-gradient-to-r from-brand-50 to-white px-4 py-3">
+            <div className="flex min-w-0 items-center gap-3">
+              {CONFIG.COMPANY_LOGO_URL
+                ? <img src={CONFIG.COMPANY_LOGO_URL} alt="" className="h-9 w-9 object-contain" />
+                : <TexNextMark className="h-9 w-9" />}
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-brand-900">{CONFIG.COMPANY_NAME}</p>
+                <p className="truncate text-xs italic text-slate-600">{CONFIG.COMPANY_TAGLINE}</p>
+              </div>
+            </div>
+            <div className="flex shrink-0 items-center gap-2 text-sm text-emerald-700">
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+              {t('online')}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    /* ============================================================
+       ৮. PAGE LAYOUT
+       ============================================================ */
+    function FeatureItem({ icon, label }) {
+      return (
+        <li className="flex flex-col items-center text-center">
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/80 text-brand-900 shadow-sm ring-1 ring-brand-100">
+            <Icon d={icon} className="h-7 w-7" />
+          </span>
+          <span className="mt-3 text-sm font-medium leading-snug text-brand-900">{label}</span>
+        </li>
+      );
+    }
+
+    function App() {
+      const { lang, setLang, t } = useLang();
+      const year = new Date().getFullYear();
+      const bg = CONFIG.LOGIN_BACKGROUND_URL ? { backgroundImage: `url(${CONFIG.LOGIN_BACKGROUND_URL})` } : {};
+
+      const features = [
+        { icon: I.cart, label: t('f_orders') },
+        { icon: I.factory, label: t('f_production') },
+        { icon: I.check, label: t('f_quality') },
+        { icon: I.box, label: t('f_inventory') },
+        { icon: I.chart, label: t('f_analytics') },
+      ];
+
+      return (
+        <div className="flex min-h-screen flex-col bg-gradient-to-b from-brand-50 to-[#E6EEF9] p-4 md:p-6">
+          <main className="mx-auto flex w-full max-w-[1320px] flex-1 flex-col overflow-hidden rounded-3xl bg-white shadow-card lg:flex-row">
+            <section className="relative hidden flex-[1.15] overflow-hidden lg:flex lg:flex-col">
+              <div className="absolute inset-0 bg-cover bg-center bg-gradient-to-br from-brand-100 to-brand-50" style={bg} />
+              <div className="absolute inset-0 bg-gradient-to-b from-white/92 via-white/70 to-white/10" />
+
+              <div className="relative z-10 flex flex-1 flex-col p-10 xl:p-12">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <TexNextMark className="h-14 w-16" />
+                    <div>
+                      <Wordmark size="sm" />
+                      <p className="mt-1 text-sm text-slate-600">{t('tagline')}</p>
+                    </div>
+                  </div>
+                  <LangSwitch lang={lang} setLang={setLang} />
+                </div>
+
+                <div className="mt-12 max-w-xl">
+                  <h2 className="text-[2.35rem] font-bold leading-[1.15] tracking-tight text-brand-900 xl:text-[2.6rem]">
+                    {t('heading')}
+                  </h2>
+                  <p className="mt-4 text-lg text-slate-700">{t('subtitle')}</p>
+                </div>
+
+                <ul className="mt-auto grid grid-cols-5 gap-3 pb-10">
+                  {features.map((f) => <FeatureItem key={f.label} {...f} />)}
+                </ul>
+
+                <p className="border-l-4 border-brand-600 pl-3 text-base italic text-brand-900">{t('slogan')}</p>
+              </div>
+            </section>
+
+            <section className="flex flex-1 flex-col justify-center px-6 py-10 sm:px-12 lg:px-14 xl:px-20">
+              <LoginCard t={t} lang={lang} setLang={setLang}
+                         onSuccess={() => { /* Step 2: ড্যাশবোর্ডে redirect */ }} />
+            </section>
+          </main>
+
+          <footer className="mx-auto mt-4 flex w-full max-w-[1320px] flex-col items-center justify-between gap-2 rounded-2xl bg-brand-900 px-6 py-4 text-sm text-white sm:flex-row">
+            <div className="flex items-center gap-2 text-brand-100">
+              <Icon d={I.shield} className="h-4 w-4" />
+              <span>{t('secure')}</span>
+            </div>
+            <span className="text-brand-100">© {year} TexNext ERP. {t('rights')}</span>
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
 </html>
