@@ -1,12 +1,15 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TexNext ERP - Login</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -25,9 +28,12 @@
   <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
   <style>
-    body { font-family: 'Inter', 'Noto Sans Bengali', system-ui, sans-serif; }
+    body {
+      font-family: 'Inter', 'Noto Sans Bengali', system-ui, sans-serif;
+    }
   </style>
 </head>
+
 <body class="min-h-screen bg-brand-50 text-brand-900 antialiased">
   <div id="root"></div>
 
@@ -124,7 +130,7 @@
        ============================================================ */
     const Icon = ({ d, className = 'h-5 w-5', stroke = 2 }) => (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={stroke}
-           strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+        strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
         {d}
       </svg>
     );
@@ -190,7 +196,7 @@
         <svg viewBox="0 0 96 80" className={className} aria-hidden="true" fill="none">
           <path d="M48 6c0 4-3 6-6 6 1 3 4 4 6 2" stroke="#1565E0" strokeWidth="3" strokeLinecap="round" />
           <path d="M48 14v8M48 22L22 40c-2 1.5-1 4 1 4h50c2 0 3-2.5 1-4L48 22z"
-                stroke="#1565E0" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
+            stroke="#1565E0" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
           <path d="M22 40l-6 12M74 40l6 12" stroke="#0B1F4B" strokeWidth="3" strokeLinecap="round" />
           <path d="M14 52c12 6 56 6 68 0" stroke="#1565E0" strokeWidth="3" strokeLinecap="round" />
         </svg>
@@ -210,7 +216,7 @@
     function LangSwitch({ lang, setLang }) {
       const btn = (code, label) => (
         <button type="button" onClick={() => setLang(code)} aria-pressed={lang === code}
-                className={lang === code ? 'font-semibold text-brand-600' : 'text-slate-500 hover:text-brand-900'}>
+          className={lang === code ? 'font-semibold text-brand-600' : 'text-slate-500 hover:text-brand-900'}>
           {label}
         </button>
       );
@@ -291,18 +297,18 @@
               <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"><Icon d={I.user} /></span>
               <label htmlFor="email" className="sr-only">{t('email')}</label>
               <input id="email" type="text" autoComplete="username" value={email}
-                     onChange={(e) => setEmail(e.target.value)} placeholder={t('email')} className={field} />
+                onChange={(e) => setEmail(e.target.value)} placeholder={t('email')} className={field} />
             </div>
 
             <div className="relative">
               <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"><Icon d={I.lock} /></span>
               <label htmlFor="password" className="sr-only">{t('password')}</label>
               <input id="password" type={showPw ? 'text' : 'password'} autoComplete="current-password"
-                     value={password} onChange={(e) => setPassword(e.target.value)}
-                     placeholder={t('password')} className={`${field} pr-12`} />
+                value={password} onChange={(e) => setPassword(e.target.value)}
+                placeholder={t('password')} className={`${field} pr-12`} />
               <button type="button" onClick={() => setShowPw(!showPw)}
-                      aria-label={showPw ? t('hide') : t('show')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-slate-500 hover:text-brand-600">
+                aria-label={showPw ? t('hide') : t('show')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-slate-500 hover:text-brand-600">
                 <Icon d={showPw ? I.eyeOff : I.eye} />
               </button>
             </div>
@@ -310,17 +316,17 @@
             <div className="flex items-center justify-between gap-3 pt-1">
               <label className="flex cursor-pointer items-center gap-2.5 text-[15px] text-brand-900">
                 <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)}
-                       className="h-[18px] w-[18px] rounded border-brand-100 text-brand-600 focus:ring-brand-500" />
+                  className="h-[18px] w-[18px] rounded border-brand-100 text-brand-600 focus:ring-brand-500" />
                 {t('remember')}
               </label>
               <button type="button" onClick={() => setNotice(t('reset'))}
-                      className="text-[15px] font-medium text-brand-600 hover:text-brand-700 hover:underline">
+                className="text-[15px] font-medium text-brand-600 hover:text-brand-700 hover:underline">
                 {t('forgot')}
               </button>
             </div>
 
             <button type="submit" disabled={loading}
-                    className="flex w-full items-center justify-center gap-2.5 rounded-xl bg-brand-600 py-3.5 text-base font-semibold text-white shadow-md transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-70">
+              className="flex w-full items-center justify-center gap-2.5 rounded-xl bg-brand-600 py-3.5 text-base font-semibold text-white shadow-md transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-70">
               <Icon d={I.login} />
               {loading ? t('logging') : t('login')}
             </button>
@@ -332,7 +338,7 @@
             </div>
 
             <button type="button" onClick={google}
-                    className="flex w-full items-center justify-center gap-3 rounded-xl border border-brand-100 bg-white py-3 text-[15px] font-medium text-brand-900 shadow-sm transition hover:bg-brand-50">
+              className="flex w-full items-center justify-center gap-3 rounded-xl border border-brand-100 bg-white py-3 text-[15px] font-medium text-brand-900 shadow-sm transition hover:bg-brand-50">
               <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
                 <path fill="#4285F4" d="M23.5 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47a5.54 5.54 0 0 1-2.4 3.64v3.02h3.88c2.27-2.09 3.55-5.17 3.55-8.9z" />
                 <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.02c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.76-2.11-6.71-4.95H1.29v3.11A12 12 0 0 0 12 24z" />
@@ -425,7 +431,7 @@
 
             <section className="flex flex-1 flex-col justify-center px-6 py-10 sm:px-12 lg:px-14 xl:px-20">
               <LoginCard t={t} lang={lang} setLang={setLang}
-                         onSuccess={() => { /* Step 2: ড্যাশবোর্ডে redirect */ }} />
+                onSuccess={() => { /* Step 2: ড্যাশবোর্ডে redirect */ }} />
             </section>
           </main>
 
@@ -443,4 +449,5 @@
     ReactDOM.createRoot(document.getElementById('root')).render(<App />);
   </script>
 </body>
+
 </html>
